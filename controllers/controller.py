@@ -25,7 +25,11 @@ class Controller:
         )
         if path:
             image = self.model.load_image(path)
+
+            # Atualiza a imagem original e a processada (lado-a-lado)
+            self.view.display_original_image(self.model.to_tk_image(self.model.original))
             self.view.display_image(image)
+
             self.view.log_action(f"Imagem carregada: {path}")
 
     def save_image(self):
@@ -40,12 +44,41 @@ class Controller:
             self.model.save_image(path)
             self.view.log_action(f"Imagem salva em: {path}")
 
+    def apply_reset(self):
+        if self.model.original is None:
+            messagebox.showwarning("Aviso", "Nenhuma imagem carregada.")
+            return
+
+        result = self.model.reset_image()
+        self.view.display_image(result)
+        self.view.log_action("Imagem resetada para o original.")
+
     def apply_gray(self):
+        if self.model.image is None: return
         result = self.model.convert_to_gray()
         self.view.display_image(result)
         self.view.log_action("Conversão para tons de cinza aplicada.")
 
     def apply_equalization(self):
+        if self.model.image is None: return
         result = self.model.equalize_histogram()
         self.view.display_image(result)
         self.view.log_action("Equalização de histograma aplicada.")
+
+    def apply_brightness_contrast(self, brightness, contrast):
+        if self.model.image is None: return
+        result = self.model.apply_brightness_contrast(brightness, contrast)
+        self.view.display_image(result)
+        self.view.log_action(f"Brilho ({brightness}) e Contraste ({contrast:.1f}) aplicados.")
+
+    def apply_global_threshold(self, threshold_value):
+        if self.model.image is None: return
+        result = self.model.apply_global_threshold(threshold_value)
+        self.view.display_image(result)
+        self.view.log_action(f"Limiar global ({threshold_value}) aplicado.")
+
+    def apply_otsu_threshold(self):
+        if self.model.image is None: return
+        result = self.model.apply_otsu_threshold()
+        self.view.display_image(result)
+        self.view.log_action("Limiarização (Otsu) aplicada.")
