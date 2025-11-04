@@ -80,3 +80,35 @@ class Model:
         rgb = cv2.cvtColor(cv_image, cv2.COLOR_BGR2RGB)
         img = Image.fromarray(rgb)
         return ImageTk.PhotoImage(img)
+
+    # ========== Histograma ==========
+    def compute_histogram(self):
+        """
+        Retorna os histogramas da imagem atual.
+
+        Saída:
+          - Se imagem colorida: dict com chaves 'b', 'g', 'r', cada uma um array de 256 bins
+          - Se imagem em escala de cinza: dict com chave 'gray'
+        """
+        if self.image is None:
+            return None
+
+        # Garante que temos BGR para cálculo de cinza quando necessário
+        if len(self.image.shape) == 2:
+            gray = self.image
+        else:
+            gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+
+        # Histograma em escala de cinza
+        hist_gray = cv2.calcHist([gray], [0], None, [256], [0, 256]).flatten()
+
+        if len(self.image.shape) == 2:
+            return {"gray": hist_gray}
+
+        # Histograma por canal (B, G, R)
+        chans = cv2.split(self.image)
+        hist_b = cv2.calcHist([chans[0]], [0], None, [256], [0, 256]).flatten()
+        hist_g = cv2.calcHist([chans[1]], [0], None, [256], [0, 256]).flatten()
+        hist_r = cv2.calcHist([chans[2]], [0], None, [256], [0, 256]).flatten()
+
+        return {"b": hist_b, "g": hist_g, "r": hist_r, "gray": hist_gray}
