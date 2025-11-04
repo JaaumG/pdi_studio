@@ -28,3 +28,6 @@ class View:
 
     def log_action(self, text):
         self.control_panel.add_log(text)
+
+    def show_histogram(self, hist_data: dict):
+        self.control_panel.draw_histogram(hist_data)
